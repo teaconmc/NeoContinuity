@@ -10,19 +10,19 @@ import me.pepperbell.continuity.impl.client.ProcessingContextImpl;
 import net.fabricmc.fabric.api.renderer.v1.mesh.MutableQuadView;
 import net.fabricmc.fabric.api.renderer.v1.model.ForwardingBakedModel;
 import net.fabricmc.fabric.api.renderer.v1.render.RenderContext;
-import net.minecraft.block.BlockState;
-import net.minecraft.client.render.model.BakedModel;
-import net.minecraft.client.texture.Sprite;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
-import net.minecraft.util.math.random.Random;
-import net.minecraft.world.BlockRenderView;
+import net.minecraft.client.renderer.texture.TextureAtlasSprite;
+import net.minecraft.client.resources.model.BakedModel;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.util.RandomSource;
+import net.minecraft.world.level.BlockAndTintGetter;
+import net.minecraft.world.level.block.state.BlockState;
 
 public class CtmBakedModel extends ForwardingBakedModel {
 	public static final int PASSES = 4;
 
 	protected final BlockState defaultState;
-	protected volatile Function<Sprite, QuadProcessors.Slice> defaultSliceFunc;
+	protected volatile Function<TextureAtlasSprite, QuadProcessors.Slice> defaultSliceFunc;
 
 	public CtmBakedModel(BakedModel wrapped, BlockState defaultState) {
 		this.wrapped = wrapped;
@@ -30,7 +30,7 @@ public class CtmBakedModel extends ForwardingBakedModel {
 	}
 
 	@Override
-	public void emitBlockQuads(BlockRenderView blockView, BlockState state, BlockPos pos, Supplier<Random> randomSupplier, RenderContext context) {
+	public void emitBlockQuads(BlockAndTintGetter blockView, BlockState state, BlockPos pos, Supplier<RandomSource> randomSupplier, RenderContext context) {
 		if (!ContinuityConfig.INSTANCE.connectedTextures.get()) {
 			super.emitBlockQuads(blockView, state, pos, randomSupplier, context);
 			return;
@@ -83,9 +83,9 @@ public class CtmBakedModel extends ForwardingBakedModel {
 		return false;
 	}
 
-	protected Function<Sprite, QuadProcessors.Slice> getSliceFunc(BlockState state) {
+	protected Function<TextureAtlasSprite, QuadProcessors.Slice> getSliceFunc(BlockState state) {
 		if (state == defaultState) {
-			Function<Sprite, QuadProcessors.Slice> sliceFunc = defaultSliceFunc;
+			Function<TextureAtlasSprite, QuadProcessors.Slice> sliceFunc = defaultSliceFunc;
 			if (sliceFunc == null) {
 				synchronized (this) {
 					sliceFunc = defaultSliceFunc;
@@ -103,14 +103,14 @@ public class CtmBakedModel extends ForwardingBakedModel {
 	protected static class CtmQuadTransform implements RenderContext.QuadTransform {
 		protected final ProcessingContextImpl processingContext = new ProcessingContextImpl();
 
-		protected BlockRenderView blockView;
+		protected BlockAndTintGetter blockView;
 		protected BlockState appearanceState;
 		protected BlockState state;
 		protected BlockPos pos;
-		protected Supplier<Random> randomSupplier;
+		protected Supplier<RandomSource> randomSupplier;
 		protected RenderContext renderContext;
 		protected boolean useManualCulling;
-		protected Function<Sprite, QuadProcessors.Slice> sliceFunc;
+		protected Function<TextureAtlasSprite, QuadProcessors.Slice> sliceFunc;
 
 		protected boolean active;
 
@@ -131,7 +131,7 @@ public class CtmBakedModel extends ForwardingBakedModel {
 		}
 
 		protected Boolean transformOnce(MutableQuadView quad, int pass) {
-			Sprite sprite = RenderUtil.getSpriteFinder().find(quad);
+			TextureAtlasSprite sprite = RenderUtil.getSpriteFinder().find(quad);
 			QuadProcessors.Slice slice = sliceFunc.apply(sprite);
 			QuadProcessor[] processors = pass == 0 ? slice.processors() : slice.multipassProcessors();
 			for (QuadProcessor processor : processors) {
@@ -156,7 +156,7 @@ public class CtmBakedModel extends ForwardingBakedModel {
 			return active;
 		}
 
-		public void prepare(BlockRenderView blockView, BlockState appearanceState, BlockState state, BlockPos pos, Supplier<Random> randomSupplier, RenderContext renderContext, boolean useManualCulling, Function<Sprite, QuadProcessors.Slice> sliceFunc) {
+		public void prepare(BlockAndTintGetter blockView, BlockState appearanceState, BlockState state, BlockPos pos, Supplier<RandomSource> randomSupplier, RenderContext renderContext, boolean useManualCulling, Function<TextureAtlasSprite, QuadProcessors.Slice> sliceFunc) {
 			this.blockView = blockView;
 			this.appearanceState = appearanceState;
 			this.state = state;

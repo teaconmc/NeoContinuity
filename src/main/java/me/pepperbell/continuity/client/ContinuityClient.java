@@ -1,7 +1,13 @@
 package me.pepperbell.continuity.client;
 
+import com.mojang.logging.LogUtils;
+import me.pepperbell.continuity.client.config.ContinuityConfig;
+import me.pepperbell.continuity.client.config.ContinuityConfigScreen;
+import net.neoforged.bus.api.IEventBus;
+import net.neoforged.fml.ModContainer;
+import net.neoforged.fml.common.Mod;
+import net.neoforged.neoforge.client.gui.IConfigScreenFactory;
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import me.pepperbell.continuity.api.client.CachingPredicates;
 import me.pepperbell.continuity.api.client.CtmLoader;
@@ -41,20 +47,19 @@ import me.pepperbell.continuity.client.resource.ModelWrappingHandler;
 import me.pepperbell.continuity.client.util.RenderUtil;
 import me.pepperbell.continuity.client.util.biome.BiomeHolderManager;
 import me.pepperbell.continuity.impl.client.ProcessingDataKeyRegistryImpl;
-import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.resource.ResourceManagerHelper;
 import net.fabricmc.fabric.api.resource.ResourcePackActivationType;
 import net.fabricmc.loader.api.FabricLoader;
-import net.minecraft.text.Text;
-import net.minecraft.util.Identifier;
+import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceLocation;
 
-public class ContinuityClient implements ClientModInitializer {
+@Mod(ContinuityClient.ID)
+public class ContinuityClient {
 	public static final String ID = "continuity";
 	public static final String NAME = "Continuity";
-	public static final Logger LOGGER = LoggerFactory.getLogger(NAME);
+	public static final Logger LOGGER = LogUtils.getLogger();
 
-	@Override
-	public void onInitializeClient() {
+	public ContinuityClient(IEventBus modEventBus, ModContainer modContainer) {
 		ProcessingDataKeyRegistryImpl.INSTANCE.init();
 		BiomeHolderManager.init();
 		ProcessingDataKeys.init();
@@ -63,8 +68,8 @@ public class ContinuityClient implements ClientModInitializer {
 		CustomBlockLayers.ReloadListener.init();
 
 		FabricLoader.getInstance().getModContainer(ID).ifPresent(container -> {
-			ResourceManagerHelper.registerBuiltinResourcePack(asId("default"), container, Text.translatable("resourcePack.continuity.default.name"), ResourcePackActivationType.NORMAL);
-			ResourceManagerHelper.registerBuiltinResourcePack(asId("glass_pane_culling_fix"), container, Text.translatable("resourcePack.continuity.glass_pane_culling_fix.name"), ResourcePackActivationType.NORMAL);
+			ResourceManagerHelper.registerBuiltinResourcePack(asId("default"), container, Component.translatable("resourcePack.continuity.default.name"), ResourcePackActivationType.NORMAL);
+			ResourceManagerHelper.registerBuiltinResourcePack(asId("glass_pane_culling_fix"), container, Component.translatable("resourcePack.continuity.glass_pane_culling_fix.name"), ResourcePackActivationType.NORMAL);
 		});
 
 		CtmLoaderRegistry registry = CtmLoaderRegistry.get();
@@ -213,6 +218,8 @@ public class ContinuityClient implements ClientModInitializer {
 		);
 		registry.registerLoader("overlay_vertical+horizontal", loader);
 		registry.registerLoader("overlay_v+h", loader);
+
+		modContainer.registerExtensionPoint(IConfigScreenFactory.class, (container, modListScreen) -> new ContinuityConfigScreen(modListScreen, ContinuityConfig.INSTANCE));
 	}
 
 	private static <T extends CtmProperties> CtmLoader<T> createLoader(CtmProperties.Factory<T> propertiesFactory, QuadProcessor.Factory<T> processorFactory, CachingPredicates.Factory<T> predicatesFactory) {
@@ -267,7 +274,7 @@ public class ContinuityClient implements ClientModInitializer {
 		};
 	}
 
-	public static Identifier asId(String path) {
-		return Identifier.of(ID, path);
+	public static ResourceLocation asId(String path) {
+		return ResourceLocation.fromNamespaceAndPath(ID, path);
 	}
 }

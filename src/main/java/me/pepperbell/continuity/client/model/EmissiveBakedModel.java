@@ -15,15 +15,15 @@ import net.fabricmc.fabric.api.renderer.v1.mesh.QuadEmitter;
 import net.fabricmc.fabric.api.renderer.v1.model.ForwardingBakedModel;
 import net.fabricmc.fabric.api.renderer.v1.render.RenderContext;
 import net.fabricmc.fabric.api.util.TriState;
-import net.minecraft.block.BlockState;
-import net.minecraft.client.render.RenderLayer;
-import net.minecraft.client.render.RenderLayers;
-import net.minecraft.client.render.model.BakedModel;
-import net.minecraft.client.texture.Sprite;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.random.Random;
-import net.minecraft.world.BlockRenderView;
+import net.minecraft.client.renderer.ItemBlockRenderTypes;
+import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.texture.TextureAtlasSprite;
+import net.minecraft.client.resources.model.BakedModel;
+import net.minecraft.core.BlockPos;
+import net.minecraft.util.RandomSource;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.BlockAndTintGetter;
+import net.minecraft.world.level.block.state.BlockState;
 
 public class EmissiveBakedModel extends ForwardingBakedModel {
 	protected static final RenderMaterial[] EMISSIVE_MATERIALS;
@@ -47,7 +47,7 @@ public class EmissiveBakedModel extends ForwardingBakedModel {
 	}
 
 	@Override
-	public void emitBlockQuads(BlockRenderView blockView, BlockState state, BlockPos pos, Supplier<Random> randomSupplier, RenderContext context) {
+	public void emitBlockQuads(BlockAndTintGetter blockView, BlockState state, BlockPos pos, Supplier<RandomSource> randomSupplier, RenderContext context) {
 		if (!ContinuityConfig.INSTANCE.emissiveTextures.get()) {
 			super.emitBlockQuads(blockView, state, pos, randomSupplier, context);
 			return;
@@ -79,7 +79,7 @@ public class EmissiveBakedModel extends ForwardingBakedModel {
 	}
 
 	@Override
-	public void emitItemQuads(ItemStack stack, Supplier<Random> randomSupplier, RenderContext context) {
+	public void emitItemQuads(ItemStack stack, Supplier<RandomSource> randomSupplier, RenderContext context) {
 		if (!ContinuityConfig.INSTANCE.emissiveTextures.get()) {
 			super.emitItemQuads(stack, randomSupplier, context);
 			return;
@@ -120,7 +120,7 @@ public class EmissiveBakedModel extends ForwardingBakedModel {
 
 	protected static class EmissiveBlockQuadTransform implements RenderContext.QuadTransform {
 		protected QuadEmitter emitter;
-		protected BlockRenderView blockView;
+		protected BlockAndTintGetter blockView;
 		protected BlockState state;
 		protected BlockPos pos;
 		protected RenderContext renderContext;
@@ -137,8 +137,8 @@ public class EmissiveBakedModel extends ForwardingBakedModel {
 				return false;
 			}
 
-			Sprite sprite = RenderUtil.getSpriteFinder().find(quad);
-			Sprite emissiveSprite = EmissiveSpriteApi.get().getEmissiveSprite(sprite);
+			TextureAtlasSprite sprite = RenderUtil.getSpriteFinder().find(quad);
+			TextureAtlasSprite emissiveSprite = EmissiveSpriteApi.get().getEmissiveSprite(sprite);
 			if (emissiveSprite != null) {
 				emitter.copyFrom(quad);
 
@@ -146,7 +146,7 @@ public class EmissiveBakedModel extends ForwardingBakedModel {
 				RenderMaterial emissiveMaterial;
 				if (blendMode == BlendMode.DEFAULT) {
 					if (calculateDefaultLayer) {
-						isDefaultLayerSolid = RenderLayers.getBlockLayer(state) == RenderLayer.getSolid();
+						isDefaultLayerSolid = ItemBlockRenderTypes.getChunkRenderType(state) == RenderType.solid();
 						calculateDefaultLayer = false;
 					}
 
@@ -177,7 +177,7 @@ public class EmissiveBakedModel extends ForwardingBakedModel {
 			return didEmit;
 		}
 
-		public void prepare(QuadEmitter emitter, BlockRenderView blockView, BlockState state, BlockPos pos, RenderContext renderContext, boolean useManualCulling) {
+		public void prepare(QuadEmitter emitter, BlockAndTintGetter blockView, BlockState state, BlockPos pos, RenderContext renderContext, boolean useManualCulling) {
 			this.emitter = emitter;
 			this.blockView = blockView;
 			this.state = state;
@@ -211,8 +211,8 @@ public class EmissiveBakedModel extends ForwardingBakedModel {
 
 		@Override
 		public boolean transform(MutableQuadView quad) {
-			Sprite sprite = RenderUtil.getSpriteFinder().find(quad);
-			Sprite emissiveSprite = EmissiveSpriteApi.get().getEmissiveSprite(sprite);
+			TextureAtlasSprite sprite = RenderUtil.getSpriteFinder().find(quad);
+			TextureAtlasSprite emissiveSprite = EmissiveSpriteApi.get().getEmissiveSprite(sprite);
 			if (emissiveSprite != null) {
 				emitter.copyFrom(quad);
 				emitter.material(DEFAULT_EMISSIVE_MATERIAL);

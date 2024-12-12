@@ -1,27 +1,31 @@
 modLoader = "javafml"
-loaderVersion = "*"
-license = "LGPL-3.0-only"
+loaderVersion = "${loader_version_range}"
+license = "${mod_license}"
 issueTrackerURL = "https://github.com/PepperCode1/Continuity/issues"
 
-[properties]
-"connector:placeholder" = true
-
 [[mods]]
-modId = "continuity"
-version = "${version}"
-displayName = "Continuity"
-description = "Continuity is a Fabric mod that allows resource packs that use the OptiFine connected textures format, OptiFine emissive textures format (only for blocks and item models), or OptiFine custom block layers format to work without OptiFine."
-logoFile = "assets/continuity/icon.png"
-logoBlur = false
-authors = "PepperCode1"
-displayURL = "https://modrinth.com/mod/continuity"
+    modId = "${mod_id}"
+    version = "${mod_version}"
+    displayName = "${mod_name}"
+    description = "Continuity is a Fabric mod that allows resource packs that use the OptiFine connected textures format, OptiFine emissive textures format (only for blocks and item models), or OptiFine custom block layers format to work without OptiFine."
+    logoFile = "assets/continuity/icon.png"
+    logoBlur = false
+    authors = "${mod_authors}"
+    displayURL = "https://modrinth.com/mod/continuity"
 
-[[dependencies.continuity]]
-modId = "minecraft"
-versionRange = "[1.21.1]"
+[[mixins]]
+    config="${mod_id}.mixins.json"
 
-[[dependencies.continuity]]
-modId = "connector"
+[[dependencies.${mod_id}]]
+    modId="minecraft"
+    type="required"
+    versionRange="${minecraft_version_range}"
+    ordering="NONE"
+    side="BOTH"
 
-[[dependencies.continuity]]
-modId = "fabric_api"
+[[dependencies.${mod_id}]]
+    modId="neoforge"
+    type="required"
+    versionRange="${neo_version_range}"
+    ordering="NONE"
+    side="BOTH"

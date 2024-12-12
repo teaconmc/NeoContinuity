@@ -13,17 +13,17 @@ import me.pepperbell.continuity.client.ContinuityClient;
 import me.pepperbell.continuity.client.properties.PropertiesParsingHelper;
 import net.fabricmc.fabric.api.resource.ResourceManagerHelper;
 import net.fabricmc.fabric.api.resource.SimpleSynchronousResourceReloadListener;
-import net.minecraft.block.BlockState;
-import net.minecraft.client.render.RenderLayer;
-import net.minecraft.resource.Resource;
-import net.minecraft.resource.ResourceManager;
-import net.minecraft.resource.ResourceType;
-import net.minecraft.util.Identifier;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.EmptyBlockView;
+import net.minecraft.client.renderer.RenderType;
+import net.minecraft.core.BlockPos;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.packs.PackType;
+import net.minecraft.server.packs.resources.Resource;
+import net.minecraft.server.packs.resources.ResourceManager;
+import net.minecraft.world.level.EmptyBlockGetter;
+import net.minecraft.world.level.block.state.BlockState;
 
 public final class CustomBlockLayers {
-	public static final Identifier LOCATION = Identifier.ofVanilla("optifine/block.properties");
+	public static final ResourceLocation LOCATION = ResourceLocation.withDefaultNamespace("optifine/block.properties");
 
 	@SuppressWarnings("unchecked")
 	private static final Predicate<BlockState>[] EMPTY_LAYER_PREDICATES = new Predicate[BlockLayer.VALUES.length];
@@ -40,9 +40,9 @@ public final class CustomBlockLayers {
 	}
 
 	@Nullable
-	public static RenderLayer getLayer(BlockState state) {
+	public static RenderType getLayer(BlockState state) {
 		if (!disableSolidCheck) {
-			if (state.isOpaqueFullCube(EmptyBlockView.INSTANCE, BlockPos.ORIGIN)) {
+			if (state.isSolidRender(EmptyBlockGetter.INSTANCE, BlockPos.ZERO)) {
 				return null;
 			}
 		}
@@ -66,17 +66,17 @@ public final class CustomBlockLayers {
 		Optional<Resource> optionalResource = manager.getResource(LOCATION);
 		if (optionalResource.isPresent()) {
 			Resource resource = optionalResource.get();
-			try (InputStream inputStream = resource.getInputStream()) {
+			try (InputStream inputStream = resource.open()) {
 				Properties properties = new Properties();
 				properties.load(inputStream);
-				reload(properties, LOCATION, resource.getPackId());
+				reload(properties, LOCATION, resource.sourcePackId());
 			} catch (IOException e) {
-				ContinuityClient.LOGGER.error("Failed to load custom block layers from file '" + LOCATION + "' from pack '" + resource.getPackId() + "'", e);
+				ContinuityClient.LOGGER.error("Failed to load custom block layers from file '" + LOCATION + "' from pack '" + resource.sourcePackId() + "'", e);
 			}
 		}
 	}
 
-	private static void reload(Properties properties, Identifier fileLocation, String packId) {
+	private static void reload(Properties properties, ResourceLocation fileLocation, String packId) {
 		for (BlockLayer blockLayer : BlockLayer.VALUES) {
 			String propertyKey = "layer." + blockLayer.getKey();
 			Predicate<BlockState> predicate = PropertiesParsingHelper.parseBlockStates(properties, propertyKey, fileLocation, packId);
@@ -93,41 +93,41 @@ public final class CustomBlockLayers {
 	}
 
 	public static class ReloadListener implements SimpleSynchronousResourceReloadListener {
-		public static final Identifier ID = ContinuityClient.asId("custom_block_layers");
+		public static final ResourceLocation ID = ContinuityClient.asId("custom_block_layers");
 		private static final ReloadListener INSTANCE = new ReloadListener();
 
 		public static void init() {
-			ResourceManagerHelper.get(ResourceType.CLIENT_RESOURCES).registerReloadListener(INSTANCE);
+			ResourceManagerHelper.get(PackType.CLIENT_RESOURCES).registerReloadListener(INSTANCE);
 		}
 
 		@Override
-		public void reload(ResourceManager manager) {
+		public void onResourceManagerReload(ResourceManager manager) {
 			CustomBlockLayers.reload(manager);
 		}
 
 		@Override
-		public Identifier getFabricId() {
+		public ResourceLocation getFabricId() {
 			return ID;
 		}
 	}
 
 	private enum BlockLayer {
-		SOLID(RenderLayer.getSolid()),
-		CUTOUT(RenderLayer.getCutout()),
-		CUTOUT_MIPPED(RenderLayer.getCutoutMipped()),
-		TRANSLUCENT(RenderLayer.getTranslucent());
+		SOLID(RenderType.solid()),
+		CUTOUT(RenderType.cutout()),
+		CUTOUT_MIPPED(RenderType.cutoutMipped()),
+		TRANSLUCENT(RenderType.translucent());
 
 		public static final BlockLayer[] VALUES = values();
 
-		private final RenderLayer layer;
+		private final RenderType layer;
 		private final String key;
 
-		BlockLayer(RenderLayer layer) {
+		BlockLayer(RenderType layer) {
 			this.layer = layer;
 			key = name().toLowerCase(Locale.ROOT);
 		}
 
-		public RenderLayer getLayer() {
+		public RenderType getLayer() {
 			return layer;
 		}
 

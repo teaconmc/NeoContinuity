@@ -6,11 +6,11 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import me.pepperbell.continuity.client.util.SpriteCalculator;
-import net.minecraft.client.render.block.BlockModels;
+import net.minecraft.client.renderer.block.BlockModelShaper;
 
-@Mixin(BlockModels.class)
+@Mixin(BlockModelShaper.class)
 abstract class BlockModelsMixin {
-	@Inject(method = "setModels(Ljava/util/Map;)V", at = @At("HEAD"))
+	@Inject(method = "replaceCache", at = @At("HEAD"))
 	private void continuity$onHeadSetModels(CallbackInfo ci) {
 		SpriteCalculator.clearCache();
 	}

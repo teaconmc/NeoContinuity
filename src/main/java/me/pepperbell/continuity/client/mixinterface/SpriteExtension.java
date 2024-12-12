@@ -1,12 +1,11 @@
 package me.pepperbell.continuity.client.mixinterface;
 
+import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import org.jetbrains.annotations.Nullable;
-
-import net.minecraft.client.texture.Sprite;
 
 public interface SpriteExtension {
 	@Nullable
-	Sprite continuity$getEmissiveSprite();
+	TextureAtlasSprite continuity$getEmissiveSprite();
 
-	void continuity$setEmissiveSprite(Sprite sprite);
+	void continuity$setEmissiveSprite(TextureAtlasSprite sprite);
 }

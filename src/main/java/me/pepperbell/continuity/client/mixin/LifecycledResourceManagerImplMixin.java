@@ -12,12 +12,12 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import me.pepperbell.continuity.client.mixinterface.LifecycledResourceManagerImplExtension;
 import me.pepperbell.continuity.client.resource.ResourceRedirectHandler;
-import net.minecraft.resource.LifecycledResourceManagerImpl;
-import net.minecraft.resource.ResourcePack;
-import net.minecraft.resource.ResourceType;
-import net.minecraft.util.Identifier;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.packs.PackResources;
+import net.minecraft.server.packs.PackType;
+import net.minecraft.server.packs.resources.MultiPackResourceManager;
 
-@Mixin(LifecycledResourceManagerImpl.class)
+@Mixin(MultiPackResourceManager.class)
 abstract class LifecycledResourceManagerImplMixin implements LifecycledResourceManagerImplExtension {
 	@Unique
 	private ResourceRedirectHandler continuity$redirectHandler;
@@ -28,23 +28,23 @@ abstract class LifecycledResourceManagerImplMixin implements LifecycledResourceM
 		return continuity$redirectHandler;
 	}
 
-	@Inject(method = "<init>(Lnet/minecraft/resource/ResourceType;Ljava/util/List;)V", at = @At("TAIL"))
-	private void continuity$onTailInit(ResourceType type, List<ResourcePack> packs, CallbackInfo ci) {
-		if (type == ResourceType.CLIENT_RESOURCES) {
+	@Inject(method = "<init>", at = @At("TAIL"))
+	private void continuity$onTailInit(PackType type, List<PackResources> packs, CallbackInfo ci) {
+		if (type == PackType.CLIENT_RESOURCES) {
 			continuity$redirectHandler = new ResourceRedirectHandler();
 		}
 	}
 
-	@ModifyVariable(method = "getResource(Lnet/minecraft/util/Identifier;)Ljava/util/Optional;", at = @At("HEAD"), argsOnly = true)
-	private Identifier continuity$redirectGetResourceId(Identifier id) {
+	@ModifyVariable(method = "getResource", at = @At("HEAD"), argsOnly = true)
+	private ResourceLocation continuity$redirectGetResourceId(ResourceLocation id) {
 		if (continuity$redirectHandler != null) {
 			return continuity$redirectHandler.redirect(id);
 		}
 		return id;
 	}
 
-	@ModifyVariable(method = "getAllResources(Lnet/minecraft/util/Identifier;)Ljava/util/List;", at = @At("HEAD"), argsOnly = true)
-	private Identifier continuity$redirectGetAllResourcesId(Identifier id) {
+	@ModifyVariable(method = "getResourceStack", at = @At("HEAD"), argsOnly = true)
+	private ResourceLocation continuity$redirectGetAllResourcesId(ResourceLocation id) {
 		if (continuity$redirectHandler != null) {
 			return continuity$redirectHandler.redirect(id);
 		}
