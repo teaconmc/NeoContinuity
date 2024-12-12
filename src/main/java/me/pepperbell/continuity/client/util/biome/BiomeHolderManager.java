@@ -5,7 +5,6 @@ import java.util.Set;
 
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.objects.ReferenceOpenHashSet;
-import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
 import net.minecraft.core.Registry;
 import net.minecraft.core.RegistryAccess;
 import net.minecraft.core.registries.Registries;
@@ -16,7 +15,7 @@ public final class BiomeHolderManager {
 	private static final Map<ResourceLocation, BiomeHolder> HOLDER_CACHE = new Object2ObjectOpenHashMap<>();
 	private static final Set<Runnable> REFRESH_CALLBACKS = new ReferenceOpenHashSet<>();
 
-	private static RegistryAccess registryManager;
+	/*private*/public static RegistryAccess registryManager;
 
 	public static BiomeHolder getOrCreateHolder(ResourceLocation id) {
 		return HOLDER_CACHE.computeIfAbsent(id, BiomeHolder::new);
@@ -26,12 +25,12 @@ public final class BiomeHolderManager {
 		REFRESH_CALLBACKS.add(callback);
 	}
 
-	public static void init() {
+	/*public static void init() {
 		ClientPlayConnectionEvents.JOIN.register(((handler, sender, client) -> {
 			registryManager = handler.registryAccess();
 			refreshHolders();
 		}));
-	}
+	}*/
 
 	public static void refreshHolders() {
 		if (registryManager == null) {

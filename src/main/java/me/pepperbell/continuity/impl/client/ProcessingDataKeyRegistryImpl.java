@@ -12,7 +12,6 @@ import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import me.pepperbell.continuity.api.client.ProcessingDataKey;
 import me.pepperbell.continuity.api.client.ProcessingDataKeyRegistry;
-import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientLifecycleEvents;
 import net.minecraft.resources.ResourceLocation;
 
 public final class ProcessingDataKeyRegistryImpl implements ProcessingDataKeyRegistry {
@@ -54,9 +53,13 @@ public final class ProcessingDataKeyRegistryImpl implements ProcessingDataKeyReg
 		return registeredAmount;
 	}
 
-	public void init() {
-		ClientLifecycleEvents.CLIENT_STARTED.register(client -> frozen = true);
+	public void setFrozen() {
+		frozen = true;
 	}
+
+	/*public void init() {
+		ClientLifecycleEvents.CLIENT_STARTED.register(client -> );
+	}*/
 
 	public List<ProcessingDataKey<?>> getAllResettable() {
 		return allResettableView;

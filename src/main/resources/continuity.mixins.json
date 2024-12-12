@@ -6,6 +6,7 @@
   "client": [
     "AtlasLoaderMixin",
     "BakedModelManagerMixin",
+    "BlockAndTintGetterMixin",
     "BlockModelsMixin",
     "FallingBlockEntityRendererMixin",
     "IdentifierMixin",
@@ -14,6 +15,7 @@
     "NamespaceResourceManagerMixin",
     "PistonBlockEntityRendererMixin",
     "ReloadableResourceManagerImplAccessor",
+    "RenderChunkRegionMixin",
     "RenderLayersMixin",
     "SpriteLoaderMixin",
     "SpriteMixin"

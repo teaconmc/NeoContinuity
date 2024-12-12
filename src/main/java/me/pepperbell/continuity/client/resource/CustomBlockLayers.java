@@ -7,16 +7,14 @@ import java.util.Optional;
 import java.util.Properties;
 import java.util.function.Predicate;
 
+import net.minecraft.server.packs.resources.ResourceManagerReloadListener;
 import org.jetbrains.annotations.Nullable;
 
 import me.pepperbell.continuity.client.ContinuityClient;
 import me.pepperbell.continuity.client.properties.PropertiesParsingHelper;
-import net.fabricmc.fabric.api.resource.ResourceManagerHelper;
-import net.fabricmc.fabric.api.resource.SimpleSynchronousResourceReloadListener;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.core.BlockPos;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.server.packs.PackType;
 import net.minecraft.server.packs.resources.Resource;
 import net.minecraft.server.packs.resources.ResourceManager;
 import net.minecraft.world.level.EmptyBlockGetter;
@@ -92,23 +90,23 @@ public final class CustomBlockLayers {
 		}
 	}
 
-	public static class ReloadListener implements SimpleSynchronousResourceReloadListener {
-		public static final ResourceLocation ID = ContinuityClient.asId("custom_block_layers");
-		private static final ReloadListener INSTANCE = new ReloadListener();
+	public static class ReloadListener implements /*SimpleSynchronousResourceReloadListener*/ ResourceManagerReloadListener {
+		//public static final ResourceLocation ID = ContinuityClient.asId("custom_block_layers");
+		/*private*/ public static final ReloadListener INSTANCE = new ReloadListener();
 
-		public static void init() {
+		/*public static void init() {
 			ResourceManagerHelper.get(PackType.CLIENT_RESOURCES).registerReloadListener(INSTANCE);
-		}
+		}*/
 
 		@Override
 		public void onResourceManagerReload(ResourceManager manager) {
 			CustomBlockLayers.reload(manager);
 		}
 
-		@Override
+		/*@Override
 		public ResourceLocation getFabricId() {
 			return ID;
-		}
+		}*/
 	}
 
 	private enum BlockLayer {

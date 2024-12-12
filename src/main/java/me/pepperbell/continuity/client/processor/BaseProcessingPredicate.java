@@ -4,7 +4,7 @@ import java.util.EnumSet;
 import java.util.function.IntPredicate;
 import java.util.function.Predicate;
 
-import net.fabricmc.fabric.api.blockview.v2.FabricBlockView;
+import me.pepperbell.continuity.client.mixinterface.BlockAndTintGetterExtension;
 import org.jetbrains.annotations.Nullable;
 
 import me.pepperbell.continuity.api.client.ProcessingDataProvider;
@@ -85,7 +85,7 @@ public class BaseProcessingPredicate implements ProcessingPredicate {
 		@Nullable
 		public Biome get(BlockAndTintGetter blockView, BlockPos pos) {
 			if (invalid) {
-				biome = ((FabricBlockView) blockView).hasBiomes() ? ((FabricBlockView) blockView).getBiomeFabric(pos).value() : null;
+				biome = ((BlockAndTintGetterExtension) blockView).continuity$hasBiome() ? ((BlockAndTintGetterExtension) blockView).continuity$getBiome(pos).value() : null;
 				invalid = false;
 			}
 			return biome;

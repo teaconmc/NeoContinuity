@@ -42,35 +42,31 @@ import me.pepperbell.continuity.client.properties.overlay.OrientedConnectingOver
 import me.pepperbell.continuity.client.properties.overlay.RandomOverlayCtmProperties;
 import me.pepperbell.continuity.client.properties.overlay.RepeatOverlayCtmProperties;
 import me.pepperbell.continuity.client.properties.overlay.StandardOverlayCtmProperties;
-import me.pepperbell.continuity.client.resource.CustomBlockLayers;
 import me.pepperbell.continuity.client.resource.ModelWrappingHandler;
-import me.pepperbell.continuity.client.util.RenderUtil;
 import me.pepperbell.continuity.client.util.biome.BiomeHolderManager;
 import me.pepperbell.continuity.impl.client.ProcessingDataKeyRegistryImpl;
-import net.fabricmc.fabric.api.resource.ResourceManagerHelper;
-import net.fabricmc.fabric.api.resource.ResourcePackActivationType;
-import net.fabricmc.loader.api.FabricLoader;
-import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 
 @Mod(ContinuityClient.ID)
-public class ContinuityClient {
+public class ContinuityClient /*implements ClientModInitializer*/ {
 	public static final String ID = "continuity";
 	public static final String NAME = "Continuity";
+
+	//public static final Logger LOGGER = LoggerFactory.getLogger(NAME);
 	public static final Logger LOGGER = LogUtils.getLogger();
 
 	public ContinuityClient(IEventBus modEventBus, ModContainer modContainer) {
-		ProcessingDataKeyRegistryImpl.INSTANCE.init();
-		BiomeHolderManager.init();
+		//ProcessingDataKeyRegistryImpl.INSTANCE.init();
+		//BiomeHolderManager.init();
 		ProcessingDataKeys.init();
-		ModelWrappingHandler.init();
-		RenderUtil.ReloadListener.init();
-		CustomBlockLayers.ReloadListener.init();
+		//ModelWrappingHandler.init();
+		//RenderUtil.ReloadListener.init();
+		//CustomBlockLayers.ReloadListener.init();
 
-		FabricLoader.getInstance().getModContainer(ID).ifPresent(container -> {
+		/*FabricLoader.getInstance().getModContainer(ID).ifPresent(container -> {
 			ResourceManagerHelper.registerBuiltinResourcePack(asId("default"), container, Component.translatable("resourcePack.continuity.default.name"), ResourcePackActivationType.NORMAL);
 			ResourceManagerHelper.registerBuiltinResourcePack(asId("glass_pane_culling_fix"), container, Component.translatable("resourcePack.continuity.glass_pane_culling_fix.name"), ResourcePackActivationType.NORMAL);
-		});
+		});*/
 
 		CtmLoaderRegistry registry = CtmLoaderRegistry.get();
 		CtmLoader<?> loader;

@@ -1,16 +1,12 @@
 package me.pepperbell.continuity.client.resource;
 
-import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Nullable;
 import org.jetbrains.annotations.UnknownNullability;
 
 import com.google.common.collect.ImmutableMap;
 
-import me.pepperbell.continuity.client.mixinterface.ModelLoaderExtension;
 import me.pepperbell.continuity.client.model.CtmBakedModel;
 import me.pepperbell.continuity.client.model.EmissiveBakedModel;
-import net.fabricmc.fabric.api.client.model.loading.v1.ModelLoadingPlugin;
-import net.fabricmc.fabric.api.client.model.loading.v1.ModelModifier;
 import net.minecraft.client.renderer.block.BlockModelShaper;
 import net.minecraft.client.resources.model.BakedModel;
 import net.minecraft.client.resources.model.ModelBakery;
@@ -69,7 +65,7 @@ public class ModelWrappingHandler {
 		return model;
 	}
 
-	@ApiStatus.Internal
+	/*@ApiStatus.Internal
 	public static void init() {
 		ModelLoadingPlugin.register(pluginCtx -> {
 			pluginCtx.modifyModelAfterBake().register(ModelModifier.WRAP_LAST_PHASE, (model, ctx) -> {
@@ -81,5 +77,5 @@ public class ModelWrappingHandler {
 				return model;
 			});
 		});
-	}
+	}*/
 }
