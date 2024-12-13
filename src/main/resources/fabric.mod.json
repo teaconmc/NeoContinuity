@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "id": "continuity",
+  "id": "ctm",
   "version": "${version}",
 
   "name": "Continuity",
@@ -27,7 +27,7 @@
     ]
   },
   "mixins": [
-    "continuity.mixins.json"
+    "ctm.mixins.json"
   ],
 
   "depends": {

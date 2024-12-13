@@ -49,7 +49,7 @@ import net.minecraft.resources.ResourceLocation;
 
 @Mod(ContinuityClient.ID)
 public class ContinuityClient /*implements ClientModInitializer*/ {
-	public static final String ID = "continuity";
+	public static final String ID = "ctm";
 	public static final String NAME = "Continuity";
 
 	//public static final Logger LOGGER = LoggerFactory.getLogger(NAME);
