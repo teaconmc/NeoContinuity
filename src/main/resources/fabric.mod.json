@@ -20,10 +20,10 @@
   "environment": "client",
   "entrypoints": {
     "client": [
-      "me.pepperbell.continuity.client.ContinuityClient"
+      "me.pepperbell.ctm.client.ContinuityClient"
     ],
     "modmenu": [
-      "me.pepperbell.continuity.client.config.ModMenuApiImpl"
+      "me.pepperbell.ctm.client.config.ModMenuApiImpl"
     ]
   },
   "mixins": [
